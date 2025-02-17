@@ -1,4 +1,5 @@
-// api/item.js
+const express = require('express');
+const cors = require('cors');
 const axios = require('axios');
 const crypto = require('crypto');
 const OAuth = require('oauth-1.0a');
@@ -56,57 +57,58 @@ const generateOAuthHeader = (method, url, token) => {
     return headerString;
 };
 
-module.exports = async (req, res) => {
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Nueva ruta para consultar un artículo por upccode
+app.post('/api/item', async (req, res) => {
     try {
-        if (req.method === 'POST') {
-            // Extraer el UPC code del cuerpo de la solicitud POST
-            const { upccode } = req.body;
+        // Extraer el UPC code del cuerpo de la solicitud POST
+        const { upccode } = req.body;
 
-            // Validar que el UPC code no esté vacío
-            if (!upccode || upccode.trim() === '') {
-                return res.status(400).json({
-                    success: false,
-                    message: "UPC code is required"
-                });
-            }
-
-            console.log('Received UPC Code:', upccode);
-
-            // Construir la URL para el restlet de NetSuite
-            const url = `https://8019768-sb2.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=${config.SCRIPT_ID}&deploy=${config.DEPLOY_ID}&upccode=${encodeURIComponent(upccode)}`;
-
-            // Generar el encabezado OAuth para autenticación
-            const token = { key: config.ACCESS_TOKEN, secret: config.TOKEN_SECRET };
-            const authHeader = generateOAuthHeader('GET', url, token);
-            console.log('Generated OAuth Header:', authHeader);
-
-            // Realizar la solicitud GET al restlet de NetSuite
-            const response = await axios.get(url, {
-                headers: {
-                    'Authorization': authHeader,
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            console.log('NetSuite Response:', response.data);
-
-            // Enviar la respuesta al cliente
-            return res.json({ success: true, data: response.data });
-
-        } else {
-            // Si no es un POST, devuelve un error 405 Method Not Allowed
-            return res.status(405).json({
+        // Validar que el UPC code no esté vacío
+        if (!upccode || upccode.trim() === '') {
+            console.error('Server Error: UPC code is required');
+            return res.status(400).json({
                 success: false,
-                message: 'Method Not Allowed'
+                message: "UPC code is required"
             });
         }
 
+        console.log('Received UPC Code:', upccode); // Log del UPC recibido
+
+        // Construir la URL para el restlet de NetSuite
+        const url = `https://8019768-sb2.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=${config.SCRIPT_ID}&deploy=${config.DEPLOY_ID}&upccode=${encodeURIComponent(upccode)}`;
+
+        // Generar el encabezado OAuth para autenticación
+        const token = { key: config.ACCESS_TOKEN, secret: config.TOKEN_SECRET };
+        const authHeader = generateOAuthHeader('GET', url, token);
+        console.log('Generated OAuth Header:', authHeader); // Log del encabezado OAuth
+
+        // Realizar la solicitud GET al restlet de NetSuite
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': authHeader,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        console.log('NetSuite Response:', response.data); // Log de la respuesta de NetSuite
+
+        // Enviar la respuesta al cliente
+        res.json({ success: true, data: response.data });
     } catch (error) {
-        console.error('Error Details:', error.response?.data || error.message);
-        return res.status(error.response?.status || 500).json({
+        console.error('Error Details:', error.response?.data || error.message); // Log detallado del error
+        res.status(error.response?.status || 500).json({
             success: false,
             message: 'Error fetching item',
             error: error.response?.data || error.message
         });
     }
-};
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
