@@ -96,10 +96,10 @@ app.post('/api/item', async (req, res) => {
     }
 });*/
 
-app.get('/api/home', (req, res) => {
-    res.send("Home")
-})
-
+app.get('/', function(req, res) {
+    res.type('text/plain');
+    res.send('i am a beautiful butterfly');
+});
 // Nueva ruta para consultar un artículo por upccode
 app.post('/api/item', async (req, res) => {
     try {
