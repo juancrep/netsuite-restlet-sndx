@@ -112,6 +112,53 @@ app.post('/api/item', async (req, res) => {
     }
 });
 
+// New route for creating inventory record
+app.post('/api/inventory', async (req, res) => {
+    try {
+        const { sku, description, quantity } = req.body;
+
+        // Validate required fields
+        if (!sku || !description || typeof quantity !== 'number') {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required. SKU and description must be strings, quantity must be a number."
+            });
+        }
+
+        console.log('Received Inventory Data:', { sku, description, quantity });
+
+        const url = `https://8019768.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=${config.SCRIPT_ID}&deploy=${config.DEPLOY_ID}`;
+
+        const token = { key: config.ACCESS_TOKEN, secret: config.TOKEN_SECRET };
+        const authHeader = generateOAuthHeader('POST', url, token);
+        console.log('Generated OAuth Header:', authHeader);
+
+        const response = await axios.post(url, 
+            { sku, description, quantity },
+            {
+                headers: {
+                    'Authorization': authHeader,
+                    'Content-Type': 'application/json',
+                }
+            }
+        );
+
+        console.log('NetSuite Response:', response.data);
+
+        res.json({
+            success: true,
+            data: response.data
+        });
+    } catch (error) {
+        console.error('Error Details:', error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            success: false,
+            message: 'Error creating inventory record',
+            error: error.response?.data || error.message
+        });
+    }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
