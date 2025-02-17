@@ -96,6 +96,10 @@ app.post('/api/item', async (req, res) => {
     }
 });*/
 
+app.get('/api/home', (req, res) => {
+    res.send("Home")
+})
+
 // Nueva ruta para consultar un artículo por upccode
 app.post('/api/item', async (req, res) => {
     try {
