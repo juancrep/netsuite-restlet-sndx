@@ -5,12 +5,12 @@ const crypto = require('crypto');
 const OAuth = require('oauth-1.0a');
 
 const config = {
-    CONSUMER_KEY: '712d7e9e0138d863bc77e2e5d6ad1b03ee53bf01eaff12d68446ab687925c70b',
-    CONSUMER_SECRET: 'e27199db5bd0b2b8c53ac2ed67efdea7692acf84730a431d114fa526c85eacce',
-    ACCESS_TOKEN: '8c9d3048b5cc5a15ae0399f22d78ba597319c00e7178f341d571471c2a8f22b3',
-    TOKEN_SECRET: 'ecd09cd46597f27b2b7227721235d8d39f3b3fc63041173c901f8a565967279e',
-    ACCOUNT_ID: '8019768_SB2',
-    SCRIPT_ID: '2890',
+    CONSUMER_KEY: 'fba3f58b3335ac1a0f97e8ecf77e4c488d141eb1ef8402c393ae86eb6ef659b1',
+    CONSUMER_SECRET: 'add083a9877b1ab20bd63a22d19bdd3a5ea3257fe9bfc2d894cf0574fa99c22d',
+    ACCESS_TOKEN: '7fb022667a8295f91706d7bfa1ac15d6c430d2de0dda16a91a69619b55962cd3',
+    TOKEN_SECRET: 'ad47652f0df2a418576ed4c7f55f1908a3eb25f51805aca0b3927f1379086c7f',
+    ACCOUNT_ID: '8019768',
+    SCRIPT_ID: '2906',
     DEPLOY_ID: '1'
 };
 
@@ -83,7 +83,7 @@ app.post('/api/item', async (req, res) => {
         console.log('Received UPC Code:', upccode); // Log del UPC recibido
 
         // Construir la URL para el restlet de NetSuite
-        const url = `https://8019768-sb2.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=${config.SCRIPT_ID}&deploy=${config.DEPLOY_ID}&upccode=${encodeURIComponent(upccode)}`;
+        const url = `https://8019768.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=${config.SCRIPT_ID}&deploy=${config.DEPLOY_ID}&upccode=${encodeURIComponent(upccode)}`;
 
         // Generar el encabezado OAuth para autenticación
         const token = { key: config.ACCESS_TOKEN, secret: config.TOKEN_SECRET };
