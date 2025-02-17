@@ -61,6 +61,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res)=>{
+    res.send("Bienvenido")
+})
+
 // Nueva ruta para consultar un artículo por upccode
 app.post('/api/item', async (req, res) => {
     try {
